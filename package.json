@@ -1,0 +1,14 @@
+{
+  "name": "sched-prod-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --env production",
+    "seed": "node -e \"require('fs').copyFileSync('src/index.js','agent/seed/index.js.txt')\"",
+    "agent:deploy": "npm run seed && wrangler deploy -c agent/wrangler.toml"
+  },
+  "devDependencies": {
+    "wrangler": "4.149.0"
+  }
+}
