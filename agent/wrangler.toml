@@ -7,9 +7,10 @@ workers_dev = true
 crons = ["* * * * *"]
 
 [vars]
-GEMINI_MODEL = "gemini-2.5-pro"
+GEMINI_MODEL = "gemini-3.6-flash"
 API_SCRIPT = "sched-prod-api-production"
 ACCOUNT_ID = "55ea1fc4785b1f8992ee817dec9a563c"
+LIVE_URL = "https://sched-prod-api-production.lbogdanski-dev.workers.dev"
 
 # Text imports: the skill and the repo docs the agent reads.
 [[rules]]
@@ -19,6 +20,6 @@ fallthrough = true
 
 [[kv_namespaces]]
 binding = "STATE"
-id = "REPLACE_ME"
+id = "e685ca90a9db48ee994bb3dc80af920a"
 
 # Secrets (wrangler secret put): GEMINI_API_KEY, CF_API_TOKEN, TRACKER_URL, TRACKER_TOKEN, FEED_URL, LIVE_URL

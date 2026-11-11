@@ -40,14 +40,23 @@ const log = async (env, msg) => {
 
 // ---------- Gemini ----------
 async function gemini(env, system, user) {
+  let last;
+  for (const model of [env.GEMINI_MODEL, "gemini-3.5-flash", "gemini-3.7-flash"]) {
+    try { return await geminiOnce({ ...env, GEMINI_MODEL: model }, system, user); } catch (e) { last = e; }
+  }
+  throw last;
+}
+
+async function geminiOnce(env, system, user) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`;
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(env.GTIMEOUT || 90000),
     method: "POST",
     headers: { "x-goog-api-key": env.GEMINI_API_KEY, "Content-Type": "application/json" },
     body: J({
       systemInstruction: { parts: [{ text: system }] },
       contents: [{ role: "user", parts: [{ text: user }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
+      generationConfig: { responseMimeType: "application/json", temperature: 0.2, thinkingConfig: { thinkingLevel: env.THINKING || "low" } },
     }),
   });
   if (!res.ok) throw new Error(`gemini ${res.status} ${(await res.text()).slice(0, 300)}`);
@@ -120,7 +129,7 @@ async function deployScript(env, src) {
     new Blob([J({
       main_module: "index.js",
       compatibility_date: "2026-10-01",
-      bindings: [{ type: "plain_text", name: "FEED_URL", text: env.FEED_URL }],
+      bindings: [{ type: "plain_text", name: "FEED_URL", text: env.FEED_URL || "" }],
     })], { type: "application/json" })
   );
   form.append("index.js", new Blob([src], { type: "application/javascript+module" }), "index.js");
